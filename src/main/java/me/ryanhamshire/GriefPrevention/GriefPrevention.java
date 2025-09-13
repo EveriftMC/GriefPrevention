@@ -26,6 +26,9 @@ import com.griefprevention.protection.ProtectionHelper;
 import me.ryanhamshire.GriefPrevention.DataStore.NoTransferException;
 import me.ryanhamshire.GriefPrevention.events.SaveTrappedPlayerEvent;
 import me.ryanhamshire.GriefPrevention.events.TrustChangedEvent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.BanList;
 import org.bukkit.BanList.Type;
 import org.bukkit.Bukkit;
@@ -45,6 +48,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.AnimalTamer;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -889,7 +893,8 @@ public class GriefPrevention extends JavaPlugin
         databasePassword = legacyConfig.getString("GriefPrevention.Database.Password", "");
 
         // If not in use already, database settings are "secret" to discourage adoption until datastore is rewritten.
-        if (databaseUrl.isBlank()) {
+        if (databaseUrl.isBlank())
+        {
             return;
         }
 
@@ -987,7 +992,8 @@ public class GriefPrevention extends JavaPlugin
             //requires claim modification tool in hand, except if player is in creative or has the extendclaim permission.
             if (player.getGameMode() != GameMode.CREATIVE
                     && player.getItemInHand().getType() != GriefPrevention.instance.config_claims_modificationTool
-                    && !player.hasPermission("griefprevention.extendclaim.toolbypass")) {
+                    && !player.hasPermission("griefprevention.extendclaim.toolbypass"))
+            {
                 GriefPrevention.sendMessage(player, TextMode.Err, Messages.MustHoldModificationToolForThat);
                 return true;
             }
@@ -1299,11 +1305,14 @@ public class GriefPrevention extends JavaPlugin
 
             player.sendMessage(permissions.toString());
 
-            player.sendMessage(
-                    ChatColor.GOLD + this.dataStore.getMessage(Messages.Manage) + " " +
-                            ChatColor.YELLOW + this.dataStore.getMessage(Messages.Build) + " " +
-                            ChatColor.GREEN + this.dataStore.getMessage(Messages.Containers) + " " +
-                            ChatColor.BLUE + this.dataStore.getMessage(Messages.Access));
+            player.sendMessage(MiniMessage.miniMessage().deserialize(
+                    "<gold>%s <yellow>%s <green>%s <blue>%s".formatted(
+                            this.dataStore.getMessage(Messages.Manage),
+                            this.dataStore.getMessage(Messages.Build),
+                            this.dataStore.getMessage(Messages.Containers),
+                            this.dataStore.getMessage(Messages.Access)
+                    )
+            ));
 
             if (claim.getSubclaimRestrictions())
             {
@@ -1384,7 +1393,8 @@ public class GriefPrevention extends JavaPlugin
                 }
 
                 //dropping permissions
-                for (Claim targetClaim : event.getClaims()) {
+                for (Claim targetClaim : event.getClaims())
+                {
                     claim = targetClaim;
 
                     //if untrusting "all" drop all permissions
@@ -2604,6 +2614,7 @@ public class GriefPrevention extends JavaPlugin
     }
 
     private static final Cache<UUID, String> PLAYER_NAME_CACHE = CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.MINUTES).build();
+
     //helper method to resolve a player name from the player's UUID
     static @NotNull String lookupPlayerName(@Nullable UUID playerID)
     {
@@ -2829,14 +2840,34 @@ public class GriefPrevention extends JavaPlugin
     {
         if (message == null || message.isBlank()) return;
 
+        Component messageComponent = MiniMessage.miniMessage().deserialize(message).color(switch (color)
+        {
+            case BLACK -> NamedTextColor.BLACK;
+            case DARK_BLUE -> NamedTextColor.DARK_BLUE;
+            case DARK_GREEN -> NamedTextColor.DARK_GREEN;
+            case DARK_AQUA -> NamedTextColor.DARK_AQUA;
+            case DARK_RED -> NamedTextColor.DARK_RED;
+            case DARK_PURPLE -> NamedTextColor.DARK_PURPLE;
+            case GOLD -> NamedTextColor.GOLD;
+            case GRAY -> NamedTextColor.GRAY;
+            case DARK_GRAY -> NamedTextColor.DARK_GRAY;
+            case BLUE -> NamedTextColor.BLUE;
+            case GREEN -> NamedTextColor.GREEN;
+            case AQUA -> NamedTextColor.AQUA;
+            case RED -> NamedTextColor.RED;
+            case LIGHT_PURPLE -> NamedTextColor.LIGHT_PURPLE;
+            case YELLOW -> NamedTextColor.YELLOW;
+            case WHITE, MAGIC, BOLD, STRIKETHROUGH, UNDERLINE, ITALIC, RESET -> NamedTextColor.WHITE;
+        });
+
         if (player == null)
         {
-            Bukkit.getConsoleSender().sendMessage(color + message);
+            Bukkit.getConsoleSender().sendMessage(messageComponent);
             GriefPrevention.AddLogEntry(message, CustomLogEntryTypes.Debug, true);
         }
         else
         {
-            player.sendMessage(color + message);
+            player.sendMessage(messageComponent);
         }
     }
 
@@ -2873,7 +2904,7 @@ public class GriefPrevention extends JavaPlugin
     }
 
     /**
-     * @deprecated use {@link ProtectionHelper#checkPermission(Player, Location, ClaimPermission, org.bukkit.event.Event)}
+     * @deprecated use {@link ProtectionHelper#checkPermission(Player, Location, ClaimPermission, Event)}
      */
     @Deprecated(forRemoval = true, since = "17.0.0")
     public @Nullable String allowBuild(Player player, Location location)
@@ -2882,7 +2913,7 @@ public class GriefPrevention extends JavaPlugin
     }
 
     /**
-     * @deprecated use {@link ProtectionHelper#checkPermission(Player, Location, ClaimPermission, org.bukkit.event.Event)}
+     * @deprecated use {@link ProtectionHelper#checkPermission(Player, Location, ClaimPermission, Event)}
      */
     @Deprecated(forRemoval = true, since = "17.0.0")
     public @Nullable String allowBuild(Player player, Location location, Material material)
@@ -2913,7 +2944,7 @@ public class GriefPrevention extends JavaPlugin
     }
 
     /**
-     * @deprecated use {@link ProtectionHelper#checkPermission(Player, Location, ClaimPermission, org.bukkit.event.Event)}
+     * @deprecated use {@link ProtectionHelper#checkPermission(Player, Location, ClaimPermission, Event)}
      */
     @Deprecated(forRemoval = true, since = "17.0.0")
     public @Nullable String allowBreak(Player player, Block block, Location location)
@@ -2922,7 +2953,7 @@ public class GriefPrevention extends JavaPlugin
     }
 
     /**
-     * @deprecated use {@link ProtectionHelper#checkPermission(Player, Location, ClaimPermission, org.bukkit.event.Event)}
+     * @deprecated use {@link ProtectionHelper#checkPermission(Player, Location, ClaimPermission, Event)}
      */
     @Deprecated(forRemoval = true, since = "17.0.0")
     public @Nullable String allowBreak(Player player, Material material, Location location, BlockBreakEvent breakEvent)
@@ -2931,7 +2962,7 @@ public class GriefPrevention extends JavaPlugin
     }
 
     /**
-     * @deprecated use {@link ProtectionHelper#checkPermission(Player, Location, ClaimPermission, org.bukkit.event.Event)}
+     * @deprecated use {@link ProtectionHelper#checkPermission(Player, Location, ClaimPermission, Event)}
      */
     @Deprecated(forRemoval = true, since = "17.0.0")
     public @Nullable String allowBreak(Player player, Block block, Location location, BlockBreakEvent breakEvent)
