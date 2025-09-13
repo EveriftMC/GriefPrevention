@@ -19,7 +19,9 @@
 package me.ryanhamshire.GriefPrevention;
 
 import com.griefprevention.protection.ProtectionHelper;
+import it.unimi.dsi.fastutil.chars.CharObjectMutablePair;
 import me.ryanhamshire.GriefPrevention.events.ProtectDeathDropsEvent;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.ExplosionResult;
 import org.bukkit.Location;
@@ -69,6 +71,7 @@ import org.bukkit.projectiles.ProjectileSource;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.naming.CompositeName;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -730,7 +733,7 @@ public class EntityEventHandler implements Listener
         }
 
         //if the player doesn't have build permission, don't allow the breakage
-        Supplier<String> noBuildReason = ProtectionHelper.checkPermission(playerRemover, event.getEntity().getLocation(), ClaimPermission.Build, event);
+        Supplier<Component> noBuildReason = ProtectionHelper.checkPermission(playerRemover, event.getEntity().getLocation(), ClaimPermission.Build, event);
         if (noBuildReason != null)
         {
             event.setCancelled(true);
@@ -749,7 +752,7 @@ public class EntityEventHandler implements Listener
         //FEATURE: similar to above, placing a painting requires build permission in the claim
 
         //if the player doesn't have permission, don't allow the placement
-        Supplier<String> noBuildReason = ProtectionHelper.checkPermission(event.getPlayer(), event.getEntity().getLocation(), ClaimPermission.Build, event);
+        Supplier<Component> noBuildReason = ProtectionHelper.checkPermission(event.getPlayer(), event.getEntity().getLocation(), ClaimPermission.Build, event);
         if (noBuildReason != null)
         {
             event.setCancelled(true);
@@ -789,7 +792,7 @@ public class EntityEventHandler implements Listener
         if (!(entity instanceof Player player)) return;
 
         //if the player doesn't have build permission, don't allow the interaction
-        Supplier<String> noBuildReason = ProtectionHelper.checkPermission(player, player.getLocation(), ClaimPermission.Build, event);
+        Supplier<Component> noBuildReason = ProtectionHelper.checkPermission(player, player.getLocation(), ClaimPermission.Build, event);
         if (noBuildReason != null)
         {
             event.setCancelled(true);

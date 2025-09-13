@@ -22,6 +22,7 @@ import com.google.common.io.FileWriteMode;
 import com.google.common.io.Files;
 import com.griefprevention.visualization.BoundaryVisualization;
 import com.griefprevention.visualization.VisualizationType;
+import io.papermc.paper.event.player.AsyncChatCommandDecorateEvent;
 import me.ryanhamshire.GriefPrevention.events.ClaimCreatedEvent;
 import me.ryanhamshire.GriefPrevention.events.ClaimDeletedEvent;
 import me.ryanhamshire.GriefPrevention.events.ClaimExtendEvent;
@@ -29,8 +30,13 @@ import me.ryanhamshire.GriefPrevention.events.ClaimModifiedEvent;
 import me.ryanhamshire.GriefPrevention.events.ClaimResizeEvent;
 import me.ryanhamshire.GriefPrevention.events.ClaimTransferEvent;
 import me.ryanhamshire.GriefPrevention.util.BoundingBox;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
@@ -105,9 +111,9 @@ public abstract class DataStore
     private int currentSchemaVersion = -1;  //-1 means not determined yet
 
     //video links
-    public static final String SURVIVAL_VIDEO_URL = "" + ChatColor.DARK_AQUA + ChatColor.UNDERLINE + "bit.ly/mcgpuser" + ChatColor.RESET;
-    public static final String CREATIVE_VIDEO_URL = "" + ChatColor.DARK_AQUA + ChatColor.UNDERLINE + "bit.ly/mcgpcrea" + ChatColor.RESET;
-    public static final String SUBDIVISION_VIDEO_URL = "" + ChatColor.DARK_AQUA + ChatColor.UNDERLINE + "bit.ly/mcgpsub" + ChatColor.RESET;
+    public static final Component SURVIVAL_VIDEO_URL = Component.text("bit.ly/mcgpuser", NamedTextColor.DARK_AQUA, TextDecoration.UNDERLINED);
+    public static final Component CREATIVE_VIDEO_URL = Component.text("bit.ly/mcgpcrea", NamedTextColor.DARK_AQUA, TextDecoration.UNDERLINED);
+    public static final Component SUBDIVISION_VIDEO_URL = Component.text("bit.ly/mcgpsub", NamedTextColor.DARK_AQUA, TextDecoration.UNDERLINED);
 
     //list of UUIDs which are soft-muted
     ConcurrentHashMap<UUID, Boolean> softMuteMap = new ConcurrentHashMap<>();
@@ -1287,7 +1293,9 @@ public abstract class DataStore
             if (oldClaim.getArea() < 1000 && result.claim.getArea() >= 1000 && result.claim.children.isEmpty() && !player.hasPermission("griefprevention.adminclaims"))
             {
                 GriefPrevention.sendMessage(player, TextMode.Info, Messages.BecomeMayor, 200L);
-                GriefPrevention.sendMessage(player, TextMode.Instr, Messages.SubdivisionVideo2, 201L, DataStore.SUBDIVISION_VIDEO_URL);
+                GriefPrevention.sendMessageResolvers(player, TextMode.Instr, Messages.SubdivisionVideo2, 201L,
+                        Placeholder.component("video_url", DataStore.SUBDIVISION_VIDEO_URL)
+                );
             }
 
             //clean up
@@ -1398,6 +1406,12 @@ public abstract class DataStore
         }
 
         return message;
+    }
+
+    synchronized public Component getMessageResolvers(Messages messageID, TagResolver... args)
+    {
+        String message = messages[messageID.ordinal()];
+        return MiniMessage.miniMessage().deserialize(message, args);
     }
 
     //used in updating the data schema from 0 to 1.

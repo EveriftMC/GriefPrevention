@@ -18,7 +18,9 @@
 
 package me.ryanhamshire.GriefPrevention;
 
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -28,14 +30,18 @@ import org.jetbrains.annotations.Nullable;
 class SendPlayerMessageTask implements Runnable
 {
     private final Player player;
-    private final ChatColor color;
-    private final String message;
+    private final Component component;
 
-    public SendPlayerMessageTask(@Nullable Player player, @NotNull ChatColor color, @NotNull String message)
+    public SendPlayerMessageTask(@Nullable Player player, @NotNull NamedTextColor color, @NotNull String message)
     {
         this.player = player;
-        this.color = color;
-        this.message = message;
+        this.component = MiniMessage.miniMessage().deserialize(message).colorIfAbsent(color);
+    }
+
+    public SendPlayerMessageTask(Player player, Component component)
+    {
+        this.player = player;
+        this.component = component;
     }
 
     @Override
@@ -43,7 +49,7 @@ class SendPlayerMessageTask implements Runnable
     {
         if (player == null)
         {
-            GriefPrevention.sendMessage(null, this.color, this.message);
+            GriefPrevention.sendMessage(null, this.component);
             return;
         }
 
@@ -51,13 +57,13 @@ class SendPlayerMessageTask implements Runnable
         if (this.player.isDead())
         {
             PlayerData playerData = GriefPrevention.instance.dataStore.getPlayerData(this.player.getUniqueId());
-            playerData.messageOnRespawn = this.color + this.message;
+            playerData.messageOnRespawn = this.component;
         }
 
         //otherwise send it immediately
         else
         {
-            GriefPrevention.sendMessage(this.player, this.color, this.message);
+            GriefPrevention.sendMessage(this.player, this.component);
         }
     }
 }

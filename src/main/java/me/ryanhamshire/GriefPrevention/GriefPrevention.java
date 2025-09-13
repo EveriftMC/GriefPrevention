@@ -29,10 +29,12 @@ import me.ryanhamshire.GriefPrevention.events.TrustChangedEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.BanList;
 import org.bukkit.BanList.Type;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -961,11 +963,15 @@ public class GriefPrevention extends JavaPlugin
                 //link to a video demo of land claiming, based on world type
                 if (GriefPrevention.instance.creativeRulesApply(player.getLocation()))
                 {
-                    GriefPrevention.sendMessage(player, TextMode.Instr, Messages.CreativeBasicsVideo2, DataStore.CREATIVE_VIDEO_URL);
+                    GriefPrevention.sendMessageResolvers(player, TextMode.Instr, Messages.CreativeBasicsVideo2,
+                            Placeholder.component("video_url", DataStore.CREATIVE_VIDEO_URL)
+                    );
                 }
                 else if (GriefPrevention.instance.claimsEnabledForWorld(player.getLocation().getWorld()))
                 {
-                    GriefPrevention.sendMessage(player, TextMode.Instr, Messages.SurvivalBasicsVideo2, DataStore.SURVIVAL_VIDEO_URL);
+                    GriefPrevention.sendMessageResolvers(player, TextMode.Instr, Messages.SurvivalBasicsVideo2,
+                            Placeholder.component("video_url", DataStore.SURVIVAL_VIDEO_URL)
+                    );
                 }
                 return false;
             }
@@ -980,11 +986,15 @@ public class GriefPrevention extends JavaPlugin
                 //link to a video demo of land claiming, based on world type
                 if (GriefPrevention.instance.creativeRulesApply(player.getLocation()))
                 {
-                    GriefPrevention.sendMessage(player, TextMode.Instr, Messages.CreativeBasicsVideo2, DataStore.CREATIVE_VIDEO_URL);
+                    GriefPrevention.sendMessageResolvers(player, TextMode.Instr, Messages.CreativeBasicsVideo2,
+                            Placeholder.component("video_url", DataStore.CREATIVE_VIDEO_URL)
+                    );
                 }
                 else if (GriefPrevention.instance.claimsEnabledForWorld(player.getLocation().getWorld()))
                 {
-                    GriefPrevention.sendMessage(player, TextMode.Instr, Messages.SurvivalBasicsVideo2, DataStore.SURVIVAL_VIDEO_URL);
+                    GriefPrevention.sendMessageResolvers(player, TextMode.Instr, Messages.SurvivalBasicsVideo2,
+                            Placeholder.component("video_url", DataStore.SURVIVAL_VIDEO_URL)
+                    );
                 }
                 return false;
             }
@@ -1265,7 +1275,7 @@ public class GriefPrevention extends JavaPlugin
             GriefPrevention.sendMessage(player, TextMode.Info, Messages.TrustListHeader, claim.getOwnerName());
 
             StringBuilder permissions = new StringBuilder();
-            permissions.append(ChatColor.GOLD).append('>');
+            permissions.append(NamedTextColor.GOLD).append('>');
 
             if (!managers.isEmpty())
             {
@@ -1275,7 +1285,7 @@ public class GriefPrevention extends JavaPlugin
 
             player.sendMessage(permissions.toString());
             permissions = new StringBuilder();
-            permissions.append(ChatColor.YELLOW).append('>');
+            permissions.append(NamedTextColor.YELLOW).append('>');
 
             if (!builders.isEmpty())
             {
@@ -1285,7 +1295,7 @@ public class GriefPrevention extends JavaPlugin
 
             player.sendMessage(permissions.toString());
             permissions = new StringBuilder();
-            permissions.append(ChatColor.GREEN).append('>');
+            permissions.append(NamedTextColor.GREEN).append('>');
 
             if (!containers.isEmpty())
             {
@@ -1295,7 +1305,7 @@ public class GriefPrevention extends JavaPlugin
 
             player.sendMessage(permissions.toString());
             permissions = new StringBuilder();
-            permissions.append(ChatColor.BLUE).append('>');
+            permissions.append(NamedTextColor.BLUE).append('>');
 
             if (!accessors.isEmpty())
             {
@@ -1601,7 +1611,10 @@ public class GriefPrevention extends JavaPlugin
             playerData.shovelMode = ShovelMode.Subdivide;
             playerData.claimSubdividing = null;
             GriefPrevention.sendMessage(player, TextMode.Instr, Messages.SubdivisionMode);
-            GriefPrevention.sendMessage(player, TextMode.Instr, Messages.SubdivisionVideo2, DataStore.SUBDIVISION_VIDEO_URL);
+            GriefPrevention.sendMessageResolvers(player, TextMode.Instr, Messages.SubdivisionVideo2,
+                    Placeholder.component("video_url", DataStore.SUBDIVISION_VIDEO_URL)
+            );
+
 
             return true;
         }
@@ -2823,59 +2836,81 @@ public class GriefPrevention extends JavaPlugin
     }
 
     //sends a color-coded message to a player
-    public static void sendMessage(@Nullable Player player, @NotNull ChatColor color, @NotNull Messages messageID, @NotNull String @NotNull ... args)
+    public static void sendMessage(@Nullable Player player, @NotNull NamedTextColor color, @NotNull Messages messageID, @NotNull String @NotNull ... args)
     {
         sendMessage(player, color, messageID, 0, args);
     }
 
+    public static void sendMessageResolvers(@Nullable Player player, @NotNull NamedTextColor color, @NotNull Messages messageID, @NotNull TagResolver @NotNull ... args)
+    {
+        sendMessageResolvers(player, color, messageID, 0, args);
+    }
+
     //sends a color-coded message to a player
-    public static void sendMessage(@Nullable Player player, @NotNull ChatColor color, @NotNull Messages messageID, long delayInTicks, @NotNull String @NotNull ... args)
+    public static void sendMessage(@Nullable Player player, @NotNull NamedTextColor color, @NotNull Messages messageID, long delayInTicks, @NotNull String @NotNull ... args)
     {
         String message = GriefPrevention.instance.dataStore.getMessage(messageID, args);
         sendMessage(player, color, message, delayInTicks);
     }
 
+    public static void sendMessageResolvers(@Nullable Player player, @NotNull NamedTextColor color, @NotNull Messages messageID, long delayInTicks, @NotNull TagResolver @NotNull ... args)
+    {
+        Component message = GriefPrevention.instance.dataStore.getMessageResolvers(messageID, args).colorIfAbsent(color);
+        sendMessage(player, message, delayInTicks);
+    }
+
     //sends a color-coded message to a player
-    public static void sendMessage(@Nullable Player player, @NotNull ChatColor color, @Nullable String message)
+    public static void sendMessage(@Nullable Player player, @NotNull NamedTextColor color, @Nullable String message)
     {
         if (message == null || message.isBlank()) return;
 
-        Component messageComponent = MiniMessage.miniMessage().deserialize(message).colorIfAbsent(switch (color)
-        {
-            case BLACK -> NamedTextColor.BLACK;
-            case DARK_BLUE -> NamedTextColor.DARK_BLUE;
-            case DARK_GREEN -> NamedTextColor.DARK_GREEN;
-            case DARK_AQUA -> NamedTextColor.DARK_AQUA;
-            case DARK_RED -> NamedTextColor.DARK_RED;
-            case DARK_PURPLE -> NamedTextColor.DARK_PURPLE;
-            case GOLD -> NamedTextColor.GOLD;
-            case GRAY -> NamedTextColor.GRAY;
-            case DARK_GRAY -> NamedTextColor.DARK_GRAY;
-            case BLUE -> NamedTextColor.BLUE;
-            case GREEN -> NamedTextColor.GREEN;
-            case AQUA -> NamedTextColor.AQUA;
-            case RED -> NamedTextColor.RED;
-            case LIGHT_PURPLE -> NamedTextColor.LIGHT_PURPLE;
-            case YELLOW -> NamedTextColor.YELLOW;
-            case WHITE, MAGIC, BOLD, STRIKETHROUGH, UNDERLINE, ITALIC, RESET -> NamedTextColor.WHITE;
-        });
+        Component messageComponent = MiniMessage.miniMessage().deserialize(message).colorIfAbsent(color);
+        sendMessage(player, messageComponent);
+    }
 
+    public static void sendMessage(@Nullable Player player, @NotNull NamedTextColor color, @Nullable Component message)
+    {
+        if (message == null || message == Component.empty()) return;
+
+        Component messageComponent = message.colorIfAbsent(color);
+        sendMessage(player, messageComponent);
+    }
+
+    public static void sendMessage(@Nullable Player player, @NotNull Component message)
+    {
         if (player == null)
         {
-            Bukkit.getConsoleSender().sendMessage(messageComponent);
-            GriefPrevention.AddLogEntry(message, CustomLogEntryTypes.Debug, true);
+            Bukkit.getConsoleSender().sendMessage(message);
+            GriefPrevention.AddLogEntry(PlainTextComponentSerializer.plainText().serialize(message), CustomLogEntryTypes.Debug, true);
         }
         else
         {
-            player.sendMessage(messageComponent);
+            player.sendMessage(message);
         }
     }
 
-    public static void sendMessage(@Nullable Player player, @NotNull ChatColor color, @Nullable String message, long delayInTicks)
+    public static void sendMessage(@Nullable Player player, @NotNull NamedTextColor color, @Nullable String message, long delayInTicks)
     {
         if (message == null || message.isBlank()) return;
 
         SendPlayerMessageTask task = new SendPlayerMessageTask(player, color, message);
+
+        //Only schedule if there should be a delay. Otherwise, send the message right now, else the message will appear out of order.
+        if (delayInTicks > 0)
+        {
+            GriefPrevention.instance.getServer().getScheduler().runTaskLater(GriefPrevention.instance, task, delayInTicks);
+        }
+        else
+        {
+            task.run();
+        }
+    }
+
+    public static void sendMessage(@Nullable Player player, @Nullable Component message, long delayInTicks)
+    {
+        if (message == null || message == Component.empty()) return;
+
+        SendPlayerMessageTask task = new SendPlayerMessageTask(player, message);
 
         //Only schedule if there should be a delay. Otherwise, send the message right now, else the message will appear out of order.
         if (delayInTicks > 0)
@@ -2907,7 +2942,7 @@ public class GriefPrevention extends JavaPlugin
      * @deprecated use {@link ProtectionHelper#checkPermission(Player, Location, ClaimPermission, Event)}
      */
     @Deprecated(forRemoval = true, since = "17.0.0")
-    public @Nullable String allowBuild(Player player, Location location)
+    public @Nullable Component allowBuild(Player player, Location location)
     {
         return this.allowBuild(player, location, location.getBlock().getType());
     }
@@ -2916,7 +2951,7 @@ public class GriefPrevention extends JavaPlugin
      * @deprecated use {@link ProtectionHelper#checkPermission(Player, Location, ClaimPermission, Event)}
      */
     @Deprecated(forRemoval = true, since = "17.0.0")
-    public @Nullable String allowBuild(Player player, Location location, Material material)
+    public @Nullable Component allowBuild(Player player, Location location, Material material)
     {
         if (!GriefPrevention.instance.claimsEnabledForWorld(location.getWorld())) return null;
 
@@ -2939,7 +2974,7 @@ public class GriefPrevention extends JavaPlugin
         }
 
         Block block = location.getBlock();
-        Supplier<String> result = ProtectionHelper.checkPermission(player, location, ClaimPermission.Build, new BlockPlaceEvent(block, block.getState(), block, placed, player, true, EquipmentSlot.HAND));
+        Supplier<Component> result = ProtectionHelper.checkPermission(player, location, ClaimPermission.Build, new BlockPlaceEvent(block, block.getState(), block, placed, player, true, EquipmentSlot.HAND));
         return result == null ? null : result.get();
     }
 
@@ -2947,7 +2982,7 @@ public class GriefPrevention extends JavaPlugin
      * @deprecated use {@link ProtectionHelper#checkPermission(Player, Location, ClaimPermission, Event)}
      */
     @Deprecated(forRemoval = true, since = "17.0.0")
-    public @Nullable String allowBreak(Player player, Block block, Location location)
+    public @Nullable Component allowBreak(Player player, Block block, Location location)
     {
         return this.allowBreak(player, block, location, new BlockBreakEvent(block, player));
     }
@@ -2956,7 +2991,7 @@ public class GriefPrevention extends JavaPlugin
      * @deprecated use {@link ProtectionHelper#checkPermission(Player, Location, ClaimPermission, Event)}
      */
     @Deprecated(forRemoval = true, since = "17.0.0")
-    public @Nullable String allowBreak(Player player, Material material, Location location, BlockBreakEvent breakEvent)
+    public @Nullable Component allowBreak(Player player, Material material, Location location, BlockBreakEvent breakEvent)
     {
         return this.allowBreak(player, location.getBlock(), location, breakEvent);
     }
@@ -2965,9 +3000,9 @@ public class GriefPrevention extends JavaPlugin
      * @deprecated use {@link ProtectionHelper#checkPermission(Player, Location, ClaimPermission, Event)}
      */
     @Deprecated(forRemoval = true, since = "17.0.0")
-    public @Nullable String allowBreak(Player player, Block block, Location location, BlockBreakEvent breakEvent)
+    public @Nullable Component allowBreak(Player player, Block block, Location location, BlockBreakEvent breakEvent)
     {
-        Supplier<String> result = ProtectionHelper.checkPermission(player, location, ClaimPermission.Build, breakEvent);
+        Supplier<Component> result = ProtectionHelper.checkPermission(player, location, ClaimPermission.Build, breakEvent);
         return result == null ? null : result.get();
     }
 

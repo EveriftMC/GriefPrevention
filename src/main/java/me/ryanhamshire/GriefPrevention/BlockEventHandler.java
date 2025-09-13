@@ -18,12 +18,14 @@
 
 package me.ryanhamshire.GriefPrevention;
 
+import com.griefprevention.protection.ProtectionHelper;
 import com.griefprevention.visualization.BoundaryVisualization;
 import com.griefprevention.visualization.VisualizationType;
 import me.ryanhamshire.GriefPrevention.util.BoundingBox;
-import com.griefprevention.protection.ProtectionHelper;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -127,7 +129,7 @@ public class BlockEventHandler implements Listener
         Block block = breakEvent.getBlock();
 
         //make sure the player is allowed to break at the location
-        Supplier<String> noBuildReason = ProtectionHelper.checkPermission(player, block.getLocation(), ClaimPermission.Build, breakEvent);
+        Supplier<Component> noBuildReason = ProtectionHelper.checkPermission(player, block.getLocation(), ClaimPermission.Build, breakEvent);
         if (noBuildReason != null)
         {
             GriefPrevention.sendMessage(player, TextMode.Err, noBuildReason.get());
@@ -145,7 +147,7 @@ public class BlockEventHandler implements Listener
 
         if (player == null || sign == null) return;
 
-        Supplier<String> noBuildReason = ProtectionHelper.checkPermission(player, sign.getLocation(), ClaimPermission.Build, event);
+        Supplier<Component> noBuildReason = ProtectionHelper.checkPermission(player, sign.getLocation(), ClaimPermission.Build, event);
         if (noBuildReason != null)
         {
             GriefPrevention.sendMessage(player, TextMode.Err, noBuildReason.get());
@@ -195,7 +197,7 @@ public class BlockEventHandler implements Listener
                 {
                     if (otherPlayer.hasPermission("griefprevention.eavesdropsigns"))
                     {
-                        otherPlayer.sendMessage(ChatColor.GRAY + player.getName() + signMessage);
+                        otherPlayer.sendMessage(Component.text(player.getName() + signMessage, NamedTextColor.GRAY));
                     }
                 }
             }
@@ -214,7 +216,7 @@ public class BlockEventHandler implements Listener
         //make sure the player is allowed to build at the location
         for (BlockState block : placeEvent.getReplacedBlockStates())
         {
-            Supplier<String> noBuildReason = ProtectionHelper.checkPermission(player, block.getLocation(), ClaimPermission.Build, placeEvent);
+            Supplier<Component> noBuildReason = ProtectionHelper.checkPermission(player, block.getLocation(), ClaimPermission.Build, placeEvent);
             if (noBuildReason != null)
             {
                 GriefPrevention.sendMessage(player, TextMode.Err, noBuildReason.get());
@@ -272,7 +274,7 @@ public class BlockEventHandler implements Listener
         if (!GriefPrevention.instance.claimsEnabledForWorld(placeEvent.getBlock().getWorld())) return;
 
         //make sure the player is allowed to build at the location
-        Supplier<String> noBuildReason = ProtectionHelper.checkPermission(player, block.getLocation(), ClaimPermission.Build, placeEvent);
+        Supplier<Component> noBuildReason = ProtectionHelper.checkPermission(player, block.getLocation(), ClaimPermission.Build, placeEvent);
         if (noBuildReason != null)
         {
             // Allow players with container trust to place books in lecterns
@@ -303,7 +305,7 @@ public class BlockEventHandler implements Listener
 
         //If block is a chest, don't allow a DoubleChest to form across a claim boundary
         denyConnectingDoubleChestsAcrossClaimBoundary(claim, block, player);
-        
+
         if (claim != null)
         {
             playerData.lastClaim = claim;
@@ -409,7 +411,9 @@ public class BlockEventHandler implements Listener
                     }
                 }
 
-                GriefPrevention.sendMessage(player, TextMode.Instr, Messages.SurvivalBasicsVideo2, DataStore.SURVIVAL_VIDEO_URL);
+                GriefPrevention.sendMessageResolvers(player, TextMode.Instr, Messages.SurvivalBasicsVideo2,
+                        Placeholder.component("video_url", DataStore.SURVIVAL_VIDEO_URL)
+                );
             }
 
             //check to see if this chest is in a claim, and warn when it isn't
@@ -452,7 +456,9 @@ public class BlockEventHandler implements Listener
 
                     if (playerData.getClaims().size() < 2)
                     {
-                        GriefPrevention.sendMessage(player, TextMode.Instr, Messages.SurvivalBasicsVideo2, DataStore.SURVIVAL_VIDEO_URL);
+                        GriefPrevention.sendMessageResolvers(player, TextMode.Instr, Messages.SurvivalBasicsVideo2,
+                                Placeholder.component("video_url", DataStore.SURVIVAL_VIDEO_URL)
+                        );
                     }
 
                     if (playerData.lastClaim != null)
@@ -481,12 +487,13 @@ public class BlockEventHandler implements Listener
         }
     }
 
-    private static final BlockFace[] HORIZONTAL_DIRECTIONS = new BlockFace[] {
+    private static final BlockFace[] HORIZONTAL_DIRECTIONS = new BlockFace[]{
             BlockFace.NORTH,
             BlockFace.EAST,
             BlockFace.SOUTH,
             BlockFace.WEST
     };
+
     private void denyConnectingDoubleChestsAcrossClaimBoundary(Claim claim, Block block, Player player)
     {
         UUID claimOwner = null;
@@ -809,6 +816,7 @@ public class BlockEventHandler implements Listener
     }
 
     private Claim lastBlockFertilizeClaim = null;
+
     @EventHandler(priority = EventPriority.LOWEST)
     private void onBlockFertilize(@NotNull BlockFertilizeEvent event)
     {
@@ -892,6 +900,7 @@ public class BlockEventHandler implements Listener
     }
 
     private Claim lastBlockSpreadClaim = null;
+
     @EventHandler(priority = EventPriority.LOWEST)
     public void onBlockSpread(@NotNull BlockSpreadEvent spreadEvent)
     {
@@ -917,7 +926,8 @@ public class BlockEventHandler implements Listener
         Claim spreadTo = this.dataStore.getClaimAt(spreadEvent.getBlock().getLocation(), false, true, lastBlockSpreadClaim);
 
         // Spreading in unclaimed area is allowed.
-        if (spreadTo == null) {
+        if (spreadTo == null)
+        {
             return;
         }
 
@@ -948,11 +958,11 @@ public class BlockEventHandler implements Listener
 
         Block underBlock = fire.getRelative(BlockFace.DOWN);
         Tag<Material> infiniburn = switch (fire.getWorld().getEnvironment())
-                {
-                    case NETHER -> Tag.INFINIBURN_NETHER;
-                    case THE_END -> Tag.INFINIBURN_END;
-                    default -> Tag.INFINIBURN_OVERWORLD;
-                };
+        {
+            case NETHER -> Tag.INFINIBURN_NETHER;
+            case THE_END -> Tag.INFINIBURN_END;
+            default -> Tag.INFINIBURN_OVERWORLD;
+        };
 
         if (!infiniburn.isTagged(underBlock.getType()))
         {
@@ -1135,7 +1145,7 @@ public class BlockEventHandler implements Listener
         Block block = event.getHitBlock();
 
         // Ensure projectile affects block.
-        if (block == null || (block.getType() != Material.CHORUS_FLOWER  && block.getType() != Material.DECORATED_POT))
+        if (block == null || (block.getType() != Material.CHORUS_FLOWER && block.getType() != Material.DECORATED_POT))
             return;
 
         Claim claim = dataStore.getClaimAt(block.getLocation(), false, null);

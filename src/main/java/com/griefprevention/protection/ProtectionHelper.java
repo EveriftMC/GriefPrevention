@@ -8,6 +8,10 @@ import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.ryanhamshire.GriefPrevention.Messages;
 import me.ryanhamshire.GriefPrevention.PlayerData;
 import me.ryanhamshire.GriefPrevention.events.PreventBlockBreakEvent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -40,7 +44,7 @@ public final class ProtectionHelper
      * @param trigger the triggering {@link Event}, if any
      * @return the denial message supplier, or {@code null} if the action is not denied
      */
-    public static @Nullable Supplier<String> checkPermission(
+    public static @Nullable Supplier<Component> checkPermission(
             @NotNull Player player,
             @NotNull Location location,
             @NotNull ClaimPermission permission,
@@ -73,11 +77,14 @@ public final class ProtectionHelper
                 // If claims are required, provide relevant information.
                 return () ->
                 {
-                    String reason = GriefPrevention.instance.dataStore.getMessage(Messages.NoBuildOutsideClaims);
+                    TextComponent.Builder builder = Component.text();
+                    builder.append(GriefPrevention.instance.dataStore.getMessageResolvers(Messages.NoBuildOutsideClaims));
                     if (player.hasPermission("griefprevention.ignoreclaims"))
-                        reason += "  " + GriefPrevention.instance.dataStore.getMessage(Messages.IgnoreClaimsAdvertisement);
-                    reason += "  " + GriefPrevention.instance.dataStore.getMessage(Messages.CreativeBasicsVideo2, DataStore.CREATIVE_VIDEO_URL);
-                    return reason;
+                        builder.append(Component.text("  ")).append(GriefPrevention.instance.dataStore.getMessageResolvers(Messages.IgnoreClaimsAdvertisement));
+                    builder.append(Component.text("  ")).append(GriefPrevention.instance.dataStore.getMessageResolvers(Messages.CreativeBasicsVideo2,
+                            Placeholder.component("vudeo_url", DataStore.CREATIVE_VIDEO_URL)
+                    ));
+                    return builder.build();
                 };
             }
 
@@ -102,7 +109,12 @@ public final class ProtectionHelper
             }
         }
 
-        return cancel;
+        if (cancel == null) {
+            return null;
+        }
+
+        final String resolved = cancel.get();
+        return () -> MiniMessage.miniMessage().deserialize(resolved);
     }
 
 }

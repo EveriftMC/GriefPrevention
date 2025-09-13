@@ -25,9 +25,11 @@ import com.griefprevention.visualization.BoundaryVisualization;
 import com.griefprevention.visualization.VisualizationType;
 import me.ryanhamshire.GriefPrevention.events.ClaimInspectionEvent;
 import me.ryanhamshire.GriefPrevention.util.BoundingBox;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.BanList;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -206,7 +208,7 @@ class PlayerEventHandler implements Listener
                 }
                 else if (recipient.hasPermission("griefprevention.eavesdrop"))
                 {
-                    recipient.sendMessage(ChatColor.GRAY + notificationMessage);
+                    recipient.sendMessage(Component.text(notificationMessage, NamedTextColor.GRAY));
                 }
             }
             recipients.clear();
@@ -224,7 +226,7 @@ class PlayerEventHandler implements Listener
             {
                 if (recipient.hasPermission("griefprevention.eavesdrop"))
                 {
-                    recipient.sendMessage(ChatColor.GRAY + notificationMessage);
+                    recipient.sendMessage(Component.text(notificationMessage, NamedTextColor.GRAY));
                 }
             }
 
@@ -303,11 +305,15 @@ class PlayerEventHandler implements Listener
         {
             if (instance.creativeRulesApply(player.getLocation()))
             {
-                GriefPrevention.sendMessage(player, TextMode.Info, Messages.CreativeBasicsVideo2, 10L, DataStore.CREATIVE_VIDEO_URL);
+                GriefPrevention.sendMessageResolvers(player, TextMode.Info, Messages.CreativeBasicsVideo2, 10L,
+                        Placeholder.component("video_url", DataStore.CREATIVE_VIDEO_URL)
+                );
             }
             else
             {
-                GriefPrevention.sendMessage(player, TextMode.Info, Messages.SurvivalBasicsVideo2, 10L, DataStore.SURVIVAL_VIDEO_URL);
+                GriefPrevention.sendMessageResolvers(player, TextMode.Info, Messages.SurvivalBasicsVideo2, 10L,
+                        Placeholder.component("video_url", DataStore.SURVIVAL_VIDEO_URL)
+                );
             }
         }
 
@@ -461,7 +467,7 @@ class PlayerEventHandler implements Listener
                     {
                         if (onlinePlayer.hasPermission("griefprevention.eavesdrop") && !onlinePlayer.equals(targetPlayer) && !onlinePlayer.equals(player))
                         {
-                            onlinePlayer.sendMessage(ChatColor.GRAY + logMessage);
+                            onlinePlayer.sendMessage(Component.text(logMessage, NamedTextColor.GRAY));
                         }
                     }
                 }
@@ -815,7 +821,7 @@ class PlayerEventHandler implements Listener
         //also send him any messaged from grief prevention he would have received while dead
         if (playerData.messageOnRespawn != null)
         {
-            GriefPrevention.sendMessage(player, ChatColor.RESET /*color is alrady embedded in message in this case*/, playerData.messageOnRespawn, 40L);
+            GriefPrevention.sendMessage(player, playerData.messageOnRespawn, 40L);
             playerData.messageOnRespawn = null;
         }
 
@@ -1010,20 +1016,20 @@ class PlayerEventHandler implements Listener
     public void onPlayerTeleport(PlayerTeleportEvent event)
     {
         //FEATURE: prevent players from using ender pearls or chorus fruit to gain access to secured claims
-        if(!instance.config_claims_enderPearlsRequireAccessTrust) return;
+        if (!instance.config_claims_enderPearlsRequireAccessTrust) return;
 
         TeleportCause cause = event.getCause();
-        if(cause != TeleportCause.CHORUS_FRUIT && cause != TeleportCause.ENDER_PEARL) return;
+        if (cause != TeleportCause.CHORUS_FRUIT && cause != TeleportCause.ENDER_PEARL) return;
 
         Player player = event.getPlayer();
         PlayerData playerData = this.dataStore.getPlayerData(player.getUniqueId());
 
         Claim toClaim = this.dataStore.getClaimAt(event.getTo(), false, playerData.lastClaim);
-        if(toClaim == null) return;
+        if (toClaim == null) return;
 
         playerData.lastClaim = toClaim;
         Supplier<String> noAccessReason = toClaim.checkPermission(player, ClaimPermission.Access, event);
-        if(noAccessReason == null) return;
+        if (noAccessReason == null) return;
 
         GriefPrevention.sendMessage(player, TextMode.Err, noAccessReason.get());
         event.setCancelled(true);
@@ -1123,7 +1129,7 @@ class PlayerEventHandler implements Listener
         //don't allow interaction with item frames or armor stands in claimed areas without build permission
         if (entity.getType() == EntityType.ARMOR_STAND || entity instanceof Hanging)
         {
-            Supplier<String> noBuildReason = ProtectionHelper.checkPermission(player, entity.getLocation(), ClaimPermission.Build, event);
+            Supplier<Component> noBuildReason = ProtectionHelper.checkPermission(player, entity.getLocation(), ClaimPermission.Build, event);
             if (noBuildReason != null)
             {
                 GriefPrevention.sendMessage(player, TextMode.Err, noBuildReason.get());
@@ -1241,7 +1247,6 @@ class PlayerEventHandler implements Listener
     }
 
 
-
     //when a player throws an egg
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerThrowEgg(PlayerEggThrowEvent event)
@@ -1345,7 +1350,7 @@ class PlayerEventHandler implements Listener
         }
 
         //make sure the player is allowed to build at the location
-        Supplier<String> noBuildReason = ProtectionHelper.checkPermission(player, block.getLocation(), ClaimPermission.Build, bucketEvent);
+        Supplier<Component> noBuildReason = ProtectionHelper.checkPermission(player, block.getLocation(), ClaimPermission.Build, bucketEvent);
         if (noBuildReason != null)
         {
             GriefPrevention.sendMessage(player, TextMode.Err, noBuildReason.get());
@@ -1456,7 +1461,7 @@ class PlayerEventHandler implements Listener
         }
 
         //make sure the player is allowed to build at the location
-        Supplier<String> noBuildReason = ProtectionHelper.checkPermission(player, block.getLocation(), ClaimPermission.Build, bucketEvent);
+        Supplier<Component> noBuildReason = ProtectionHelper.checkPermission(player, block.getLocation(), ClaimPermission.Build, bucketEvent);
         if (noBuildReason != null)
         {
             GriefPrevention.sendMessage(player, TextMode.Err, noBuildReason.get());
@@ -1476,7 +1481,7 @@ class PlayerEventHandler implements Listener
         }
 
         Player player = event.getPlayer();
-        Supplier<String> denial = ProtectionHelper.checkPermission(player, event.getSign().getLocation(), ClaimPermission.Build, event);
+        Supplier<Component> denial = ProtectionHelper.checkPermission(player, event.getSign().getLocation(), ClaimPermission.Build, event);
 
         // If user is allowed to build, do nothing.
         if (denial == null)
@@ -1564,7 +1569,7 @@ class PlayerEventHandler implements Listener
                                 clickedBlockType == Material.STONECUTTER ||
                                 clickedBlockType == Material.SWEET_BERRY_BUSH ||
                                 clickedBlockType == Material.DECORATED_POT
-                        )))
+                )))
         {
             if (playerData == null) playerData = this.dataStore.getPlayerData(player.getUniqueId());
 
@@ -1605,13 +1610,13 @@ class PlayerEventHandler implements Listener
 
                 (instance.config_claims_lockWoodenDoors && Tag.DOORS.isTagged(clickedBlockType) ||
 
-                instance.config_claims_preventButtonsSwitches && Tag.BEDS.isTagged(clickedBlockType) ||
+                        instance.config_claims_preventButtonsSwitches && Tag.BEDS.isTagged(clickedBlockType) ||
 
-                instance.config_claims_lockTrapDoors && Tag.TRAPDOORS.isTagged(clickedBlockType) ||
+                        instance.config_claims_lockTrapDoors && Tag.TRAPDOORS.isTagged(clickedBlockType) ||
 
-                instance.config_claims_lecternReadingRequiresAccessTrust && clickedBlockType == Material.LECTERN ||
+                        instance.config_claims_lecternReadingRequiresAccessTrust && clickedBlockType == Material.LECTERN ||
 
-                instance.config_claims_lockFenceGates && Tag.FENCE_GATES.isTagged(clickedBlockType)))
+                        instance.config_claims_lockFenceGates && Tag.FENCE_GATES.isTagged(clickedBlockType)))
         {
             if (playerData == null) playerData = this.dataStore.getPlayerData(player.getUniqueId());
             Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), false, playerData.lastClaim);
@@ -1716,7 +1721,7 @@ class PlayerEventHandler implements Listener
                     || materialInHand == Material.HONEYCOMB
                     || dyes.contains(materialInHand)))
             {
-                Supplier<String> noBuildReason = ProtectionHelper.checkPermission(player, event.getClickedBlock().getLocation(), ClaimPermission.Build, event);
+                Supplier<Component> noBuildReason = ProtectionHelper.checkPermission(player, event.getClickedBlock().getLocation(), ClaimPermission.Build, event);
                 if (noBuildReason != null)
                 {
                     GriefPrevention.sendMessage(player, TextMode.Err, noBuildReason.get());
@@ -2187,7 +2192,9 @@ class PlayerEventHandler implements Listener
                     if (!player.hasPermission("griefprevention.adminclaims") && result.claim.getArea() >= 1000)
                     {
                         GriefPrevention.sendMessage(player, TextMode.Info, Messages.BecomeMayor, 200L);
-                        GriefPrevention.sendMessage(player, TextMode.Instr, Messages.SubdivisionVideo2, 201L, DataStore.SUBDIVISION_VIDEO_URL);
+                        GriefPrevention.sendMessageResolvers(player, TextMode.Instr, Messages.SubdivisionVideo2, 201L,
+                                Placeholder.component("video_url", DataStore.SUBDIVISION_VIDEO_URL)
+                        );
                     }
 
                     AutoExtendClaimTask.scheduleAsync(result.claim);

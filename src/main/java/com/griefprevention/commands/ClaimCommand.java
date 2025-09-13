@@ -10,6 +10,7 @@ import me.ryanhamshire.GriefPrevention.Messages;
 import me.ryanhamshire.GriefPrevention.PlayerData;
 import me.ryanhamshire.GriefPrevention.ShovelMode;
 import me.ryanhamshire.GriefPrevention.TextMode;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -131,7 +132,8 @@ public class ClaimCommand extends CommandHandler
         if (playerData.shovelMode == ShovelMode.Admin)
         {
             ownerId = null;
-        } else
+        }
+        else
         {
             //player must have sufficient unused claim blocks
             int area;
@@ -194,11 +196,15 @@ public class ClaimCommand extends CommandHandler
             //link to a video demo of land claiming, based on world type
             if (plugin.creativeRulesApply(player.getLocation()))
             {
-                GriefPrevention.sendMessage(player, TextMode.Instr, Messages.CreativeBasicsVideo2, DataStore.CREATIVE_VIDEO_URL);
+                GriefPrevention.sendMessageResolvers(player, TextMode.Instr, Messages.CreativeBasicsVideo2,
+                        Placeholder.component("video_url", DataStore.CREATIVE_VIDEO_URL)
+                );
             }
             else if (plugin.claimsEnabledForWorld(world))
             {
-                GriefPrevention.sendMessage(player, TextMode.Instr, Messages.SurvivalBasicsVideo2, DataStore.SURVIVAL_VIDEO_URL);
+                GriefPrevention.sendMessageResolvers(player, TextMode.Instr, Messages.SurvivalBasicsVideo2,
+                        Placeholder.component("video_url", DataStore.SURVIVAL_VIDEO_URL)
+                );
             }
             BoundaryVisualization.visualizeClaim(player, result.claim, VisualizationType.CLAIM);
             playerData.claimResizing = null;

@@ -20,6 +20,7 @@ package me.ryanhamshire.GriefPrevention;
 
 import com.griefprevention.visualization.BoundaryVisualization;
 import com.griefprevention.visualization.VisualizationType;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 
@@ -63,11 +64,15 @@ class EquipShovelProcessingTask implements Runnable
         //link to a video demo of land claiming, based on world type
         if (GriefPrevention.instance.creativeRulesApply(player.getLocation()))
         {
-            GriefPrevention.sendMessage(player, TextMode.Instr, Messages.CreativeBasicsVideo2, DataStore.CREATIVE_VIDEO_URL);
+            GriefPrevention.sendMessageResolvers(player, TextMode.Instr, Messages.CreativeBasicsVideo2,
+                    Placeholder.component("video_url", DataStore.CREATIVE_VIDEO_URL)
+            );
         }
         else if (GriefPrevention.instance.claimsEnabledForWorld(player.getWorld()))
         {
-            GriefPrevention.sendMessage(player, TextMode.Instr, Messages.SurvivalBasicsVideo2, DataStore.SURVIVAL_VIDEO_URL);
+            GriefPrevention.sendMessageResolvers(player, TextMode.Instr, Messages.SurvivalBasicsVideo2,
+                    Placeholder.component("video_url", DataStore.SURVIVAL_VIDEO_URL)
+            );
         }
 
         //if standing in a claim owned by the player, visualize it

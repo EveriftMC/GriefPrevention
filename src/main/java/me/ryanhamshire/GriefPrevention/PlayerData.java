@@ -19,6 +19,7 @@
 package me.ryanhamshire.GriefPrevention;
 
 import com.griefprevention.visualization.BoundaryVisualization;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -109,7 +110,7 @@ public class PlayerData
     boolean dropsAreUnlocked = false;
 
     //message to send to player after he respawns
-    String messageOnRespawn = null;
+    Component messageOnRespawn = null;
 
     //timestamp for last "you're building outside your land claims" message
     Long buildWarningTimestamp = null;
