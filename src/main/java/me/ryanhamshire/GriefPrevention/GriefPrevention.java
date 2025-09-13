@@ -2840,7 +2840,7 @@ public class GriefPrevention extends JavaPlugin
     {
         if (message == null || message.isBlank()) return;
 
-        Component messageComponent = MiniMessage.miniMessage().deserialize(message).color(switch (color)
+        Component messageComponent = MiniMessage.miniMessage().deserialize(message).colorIfAbsent(switch (color)
         {
             case BLACK -> NamedTextColor.BLACK;
             case DARK_BLUE -> NamedTextColor.DARK_BLUE;
