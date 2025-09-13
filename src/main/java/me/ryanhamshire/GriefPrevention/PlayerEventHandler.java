@@ -301,21 +301,21 @@ class PlayerEventHandler implements Listener
             this.howToClaimPattern = Pattern.compile(this.dataStore.getMessage(Messages.HowToClaimRegex), Pattern.CASE_INSENSITIVE);
         }
 
-        if (this.howToClaimPattern.matcher(message).matches())
-        {
-            if (instance.creativeRulesApply(player.getLocation()))
-            {
-                GriefPrevention.sendMessageResolvers(player, TextMode.Info, Messages.CreativeBasicsVideo2, 10L,
-                        Placeholder.component("video_url", DataStore.CREATIVE_VIDEO_URL)
-                );
-            }
-            else
-            {
-                GriefPrevention.sendMessageResolvers(player, TextMode.Info, Messages.SurvivalBasicsVideo2, 10L,
-                        Placeholder.component("video_url", DataStore.SURVIVAL_VIDEO_URL)
-                );
-            }
-        }
+//        if (this.howToClaimPattern.matcher(message).matches())
+//        {
+//            if (instance.creativeRulesApply(player.getLocation()))
+//            {
+//                GriefPrevention.sendMessageResolvers(player, TextMode.Info, Messages.CreativeBasicsVideo2, 10L,
+//                        Placeholder.component("video_url", DataStore.CREATIVE_VIDEO_URL)
+//                );
+//            }
+//            else
+//            {
+//                GriefPrevention.sendMessageResolvers(player, TextMode.Info, Messages.SurvivalBasicsVideo2, 10L,
+//                        Placeholder.component("video_url", DataStore.SURVIVAL_VIDEO_URL)
+//                );
+//            }
+//        }
 
         //FEATURE: automatically educate players about the /trapped command
         //check for "trapped" or "stuck" to educate players about the /trapped command
@@ -2192,9 +2192,9 @@ class PlayerEventHandler implements Listener
                     if (!player.hasPermission("griefprevention.adminclaims") && result.claim.getArea() >= 1000)
                     {
                         GriefPrevention.sendMessage(player, TextMode.Info, Messages.BecomeMayor, 200L);
-                        GriefPrevention.sendMessageResolvers(player, TextMode.Instr, Messages.SubdivisionVideo2, 201L,
-                                Placeholder.component("video_url", DataStore.SUBDIVISION_VIDEO_URL)
-                        );
+//                        GriefPrevention.sendMessageResolvers(player, TextMode.Instr, Messages.SubdivisionVideo2, 201L,
+//                                Placeholder.component("video_url", DataStore.SUBDIVISION_VIDEO_URL)
+//                        );
                     }
 
                     AutoExtendClaimTask.scheduleAsync(result.claim);

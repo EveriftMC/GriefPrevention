@@ -1293,9 +1293,9 @@ public abstract class DataStore
             if (oldClaim.getArea() < 1000 && result.claim.getArea() >= 1000 && result.claim.children.isEmpty() && !player.hasPermission("griefprevention.adminclaims"))
             {
                 GriefPrevention.sendMessage(player, TextMode.Info, Messages.BecomeMayor, 200L);
-                GriefPrevention.sendMessageResolvers(player, TextMode.Instr, Messages.SubdivisionVideo2, 201L,
-                        Placeholder.component("video_url", DataStore.SUBDIVISION_VIDEO_URL)
-                );
+//                GriefPrevention.sendMessageResolvers(player, TextMode.Instr, Messages.SubdivisionVideo2, 201L,
+//                        Placeholder.component("video_url", DataStore.SUBDIVISION_VIDEO_URL)
+//                );
             }
 
             //clean up

@@ -963,15 +963,15 @@ public class GriefPrevention extends JavaPlugin
                 //link to a video demo of land claiming, based on world type
                 if (GriefPrevention.instance.creativeRulesApply(player.getLocation()))
                 {
-                    GriefPrevention.sendMessageResolvers(player, TextMode.Instr, Messages.CreativeBasicsVideo2,
-                            Placeholder.component("video_url", DataStore.CREATIVE_VIDEO_URL)
-                    );
+//                    GriefPrevention.sendMessageResolvers(player, TextMode.Instr, Messages.CreativeBasicsVideo2,
+//                            Placeholder.component("video_url", DataStore.CREATIVE_VIDEO_URL)
+//                    );
                 }
                 else if (GriefPrevention.instance.claimsEnabledForWorld(player.getLocation().getWorld()))
                 {
-                    GriefPrevention.sendMessageResolvers(player, TextMode.Instr, Messages.SurvivalBasicsVideo2,
-                            Placeholder.component("video_url", DataStore.SURVIVAL_VIDEO_URL)
-                    );
+//                    GriefPrevention.sendMessageResolvers(player, TextMode.Instr, Messages.SurvivalBasicsVideo2,
+//                            Placeholder.component("video_url", DataStore.SURVIVAL_VIDEO_URL)
+//                    );
                 }
                 return false;
             }
@@ -986,15 +986,15 @@ public class GriefPrevention extends JavaPlugin
                 //link to a video demo of land claiming, based on world type
                 if (GriefPrevention.instance.creativeRulesApply(player.getLocation()))
                 {
-                    GriefPrevention.sendMessageResolvers(player, TextMode.Instr, Messages.CreativeBasicsVideo2,
-                            Placeholder.component("video_url", DataStore.CREATIVE_VIDEO_URL)
-                    );
+//                    GriefPrevention.sendMessageResolvers(player, TextMode.Instr, Messages.CreativeBasicsVideo2,
+//                            Placeholder.component("video_url", DataStore.CREATIVE_VIDEO_URL)
+//                    );
                 }
                 else if (GriefPrevention.instance.claimsEnabledForWorld(player.getLocation().getWorld()))
                 {
-                    GriefPrevention.sendMessageResolvers(player, TextMode.Instr, Messages.SurvivalBasicsVideo2,
-                            Placeholder.component("video_url", DataStore.SURVIVAL_VIDEO_URL)
-                    );
+//                    GriefPrevention.sendMessageResolvers(player, TextMode.Instr, Messages.SurvivalBasicsVideo2,
+//                            Placeholder.component("video_url", DataStore.SURVIVAL_VIDEO_URL)
+//                    );
                 }
                 return false;
             }
@@ -1611,9 +1611,9 @@ public class GriefPrevention extends JavaPlugin
             playerData.shovelMode = ShovelMode.Subdivide;
             playerData.claimSubdividing = null;
             GriefPrevention.sendMessage(player, TextMode.Instr, Messages.SubdivisionMode);
-            GriefPrevention.sendMessageResolvers(player, TextMode.Instr, Messages.SubdivisionVideo2,
-                    Placeholder.component("video_url", DataStore.SUBDIVISION_VIDEO_URL)
-            );
+//            GriefPrevention.sendMessageResolvers(player, TextMode.Instr, Messages.SubdivisionVideo2,
+//                    Placeholder.component("video_url", DataStore.SUBDIVISION_VIDEO_URL)
+//            );
 
 
             return true;

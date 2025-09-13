@@ -196,15 +196,15 @@ public class ClaimCommand extends CommandHandler
             //link to a video demo of land claiming, based on world type
             if (plugin.creativeRulesApply(player.getLocation()))
             {
-                GriefPrevention.sendMessageResolvers(player, TextMode.Instr, Messages.CreativeBasicsVideo2,
-                        Placeholder.component("video_url", DataStore.CREATIVE_VIDEO_URL)
-                );
+//                GriefPrevention.sendMessageResolvers(player, TextMode.Instr, Messages.CreativeBasicsVideo2,
+//                        Placeholder.component("video_url", DataStore.CREATIVE_VIDEO_URL)
+//                );
             }
             else if (plugin.claimsEnabledForWorld(world))
             {
-                GriefPrevention.sendMessageResolvers(player, TextMode.Instr, Messages.SurvivalBasicsVideo2,
-                        Placeholder.component("video_url", DataStore.SURVIVAL_VIDEO_URL)
-                );
+//                GriefPrevention.sendMessageResolvers(player, TextMode.Instr, Messages.SurvivalBasicsVideo2,
+//                        Placeholder.component("video_url", DataStore.SURVIVAL_VIDEO_URL)
+//                );
             }
             BoundaryVisualization.visualizeClaim(player, result.claim, VisualizationType.CLAIM);
             playerData.claimResizing = null;

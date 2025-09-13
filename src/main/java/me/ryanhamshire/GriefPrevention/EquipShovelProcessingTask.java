@@ -64,15 +64,15 @@ class EquipShovelProcessingTask implements Runnable
         //link to a video demo of land claiming, based on world type
         if (GriefPrevention.instance.creativeRulesApply(player.getLocation()))
         {
-            GriefPrevention.sendMessageResolvers(player, TextMode.Instr, Messages.CreativeBasicsVideo2,
-                    Placeholder.component("video_url", DataStore.CREATIVE_VIDEO_URL)
-            );
+//            GriefPrevention.sendMessageResolvers(player, TextMode.Instr, Messages.CreativeBasicsVideo2,
+//                    Placeholder.component("video_url", DataStore.CREATIVE_VIDEO_URL)
+//            );
         }
         else if (GriefPrevention.instance.claimsEnabledForWorld(player.getWorld()))
         {
-            GriefPrevention.sendMessageResolvers(player, TextMode.Instr, Messages.SurvivalBasicsVideo2,
-                    Placeholder.component("video_url", DataStore.SURVIVAL_VIDEO_URL)
-            );
+//            GriefPrevention.sendMessageResolvers(player, TextMode.Instr, Messages.SurvivalBasicsVideo2,
+//                    Placeholder.component("video_url", DataStore.SURVIVAL_VIDEO_URL)
+//            );
         }
 
         //if standing in a claim owned by the player, visualize it

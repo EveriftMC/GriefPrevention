@@ -81,9 +81,9 @@ public final class ProtectionHelper
                     builder.append(GriefPrevention.instance.dataStore.getMessageResolvers(Messages.NoBuildOutsideClaims));
                     if (player.hasPermission("griefprevention.ignoreclaims"))
                         builder.append(Component.text("  ")).append(GriefPrevention.instance.dataStore.getMessageResolvers(Messages.IgnoreClaimsAdvertisement));
-                    builder.append(Component.text("  ")).append(GriefPrevention.instance.dataStore.getMessageResolvers(Messages.CreativeBasicsVideo2,
-                            Placeholder.component("vudeo_url", DataStore.CREATIVE_VIDEO_URL)
-                    ));
+//                    builder.append(Component.text("  ")).append(GriefPrevention.instance.dataStore.getMessageResolvers(Messages.CreativeBasicsVideo2,
+//                            Placeholder.component("vudeo_url", DataStore.CREATIVE_VIDEO_URL)
+//                    ));
                     return builder.build();
                 };
             }
